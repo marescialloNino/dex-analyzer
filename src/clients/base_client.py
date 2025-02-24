@@ -10,7 +10,7 @@ class BaseDEXClient(ABC):
         self.chain_name = chain_name
         self.dex_name = dex_name
         self.stablecoins = {"USDC", "USDT", "DAI"}
-        self.pivots = {"SOL", "RAY", "JLP"} 
+        self.pivots = {"SOL", "RAY", "JLP", "JUP"} 
 
     @abstractmethod
     def fetch_liquidity_pools(self) -> List[LiquidityPair]:
@@ -27,13 +27,33 @@ class BaseDEXClient(ABC):
         """Retrieve open positions."""
         pass
 
-    def filter_pairs(self, pairs: List[LiquidityPair], min_tvl: float = 10000, min_volume: float = 5000) -> List[LiquidityPair]:
+    def filter_pairs(self, pairs: List[LiquidityPair], min_tvl: float = 10000, min_volume: float = 5000, no_stables: bool=True, no_pivots: bool=True) -> List[LiquidityPair]:
         """Filter pairs."""
-        return [
-            pair for pair in pairs
-            if (pair.token0_symbol not in self.stablecoins and 
-                pair.token1_symbol not in self.stablecoins and 
-                pair.token0_symbol not in self.pivots and 
-                pair.token1_symbol not in self.pivots and 
-                pair.tvl >= min_tvl and pair.volume >= min_volume)
-        ]
+        if (no_stables and no_pivots):
+            return [
+                pair for pair in pairs
+                if (pair.token0_symbol not in self.stablecoins and 
+                    pair.token1_symbol not in self.stablecoins and 
+                    pair.token0_symbol not in self.pivots and 
+                    pair.token1_symbol not in self.pivots and 
+                    pair.tvl >= min_tvl and pair.volume >= min_volume)
+            ]
+        elif (no_stables and not no_pivots):
+            return [
+                pair for pair in pairs
+                if (pair.token0_symbol not in self.stablecoins and 
+                    pair.token1_symbol not in self.stablecoins and  
+                    pair.tvl >= min_tvl and pair.volume >= min_volume)
+            ]
+        elif (no_pivots and not no_stables):
+            return [
+                pair for pair in pairs
+                if (pair.token0_symbol not in self.stablecoins and 
+                    pair.token1_symbol not in self.stablecoins and 
+                    pair.tvl >= min_tvl and pair.volume >= min_volume)
+            ]
+        else:
+            return [
+                pair for pair in pairs
+                if (pair.tvl >= min_tvl and pair.volume >= min_volume)
+            ]

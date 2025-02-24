@@ -1,1 +1,4 @@
 solders
+mplfinance
+requests
+pandas
