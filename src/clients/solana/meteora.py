@@ -31,7 +31,7 @@ class SolanaMeteoraClient(BaseDEXClient):
         self.stablecoins = {"USDC", "USDT"}
         self.pivots = {"SOL", "JUP", "JLP", "JUPSOL", "JITOSOL"}
         self.price_fetcher = MoralisPriceFetcher()
-        self.token_symbols = self._fetch_token_symbols()  # Map token addresses to symbols
+        self.token_symbols = self._fetch_token_symbols()  # Map token addresses to symbols with coingecko api
 
     def _fetch_token_symbols(self) -> Dict[str, str]:
         """Fetch token address to symbol mapping from CoinGecko."""
@@ -60,7 +60,7 @@ class SolanaMeteoraClient(BaseDEXClient):
         """Fetch all liquidity pools from Meteora."""
         print(f"Fetching pools from {self.api_url}/pair/all")
         try:
-            response = self.session.get(f"{self.api_url}/pair/all", timeout=10)
+            response = self.session.get(f"{self.api_url}/pair/all", timeout=30)
             print(f"Status code: {response.status_code}")
             response.raise_for_status()
             data = response.json()
@@ -79,7 +79,7 @@ class SolanaMeteoraClient(BaseDEXClient):
                         print(f"Skipping pair with missing mints: {pair}")
                         continue
 
-                    # Use CoinGecko-mapped symbols instead of parsing name
+                    # Use CoinGecko-mapped symbols to find symble for token address
                     token0_symbol = self.token_symbols.get(mint_x, mint_x[-6:] if mint_x else "UNKNOWN")
                     token1_symbol = self.token_symbols.get(mint_y, mint_y[-6:] if mint_y else "UNKNOWN")
 

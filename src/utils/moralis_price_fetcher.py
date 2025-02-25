@@ -14,7 +14,7 @@ class MoralisPriceFetcher:
         self.api_key = os.getenv("MORALIS_API_KEY")
         if not self.api_key:
             raise ValueError("Moralis API key not found in .env")
-        self.base_url = "https://solana-gateway.moralis.io"  # Correct base URL
+        self.base_url = "https://solana-gateway.moralis.io"  
         self.headers = {
             "accept": "application/json",
             "X-API-Key": self.api_key
@@ -38,7 +38,7 @@ class MoralisPriceFetcher:
 
             while True:
                 # Build URL with cursor if available
-                url = f"{self.base_url}/token/mainnet/pairs/{pair_address}/ohlcv?timeframe={timeframe}&baseCurrency={base_currency}&fromDate={from_date}&toDate={to_date}&limit=50"
+                url = f"{self.base_url}/token/mainnet/pairs/{pair_address}/ohlcv?timeframe={timeframe}&baseCurrency={base_currency}&fromDate={from_date}&toDate={to_date}&limit=100"
                 if cursor:
                     url += f"&cursor={cursor}"
                 print(f"Requesting page {page}: {url}")

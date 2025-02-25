@@ -1,4 +1,3 @@
-# src/utils/coingecko_price_fetcher.py
 import pandas as pd
 from datetime import datetime, timedelta
 import requests
