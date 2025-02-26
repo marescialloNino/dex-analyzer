@@ -22,10 +22,6 @@ class BaseDEXClient(ABC):
         """Fetch price bars."""
         pass
 
-    @abstractmethod
-    def get_open_positions(self, address: str) -> List[Position]:
-        """Retrieve open positions."""
-        pass
 
     def filter_pairs(self, pairs: List[LiquidityPair], min_tvl: float = 10000, min_volume: float = 5000, no_stables: bool=True, no_pivots: bool=True) -> List[LiquidityPair]:
         """Filter pairs."""
