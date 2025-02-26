@@ -73,16 +73,5 @@ class MoralisPriceFetcher:
             return PriceBar(pair_address, base_currency, token_symbol, df)
 
         except (requests.exceptions.RequestException, ValueError, KeyError) as e:
-            print(f"Price fetch failed: {e}, falling back to mock data")
-            periods = {"1h": 168, "4h": 42, "1d": 7}.get(timeframe, 168)
-            start_time = datetime.strptime(from_date, "%Y-%m-%d") if from_date else datetime.now() - timedelta(days=7)
-            df = pd.DataFrame({
-                "timestamp": pd.date_range(start=start_time, periods=periods, freq=timeframe),
-                "open": [100] * periods,
-                "high": [100] * periods,
-                "low": [100] * periods,
-                "close": [100] * periods,
-                "volume": [0] * periods
-            })
-            print(f"Mock columns: {df.columns.tolist()}")
-            return PriceBar(pair_address, base_currency, token_symbol, df)
+            print(f"Price fetch failed for {token_symbol}: {e}")
+            return None 
