@@ -9,7 +9,7 @@ class Network(Enum):
 class SolanaDex(Enum):
     RAYDIUM = "raydium"
     METEORA = "meteora"
-    ORCA="orca"
+    ORCA = "orca"
 
 class EthereumDex(Enum):
     UNISWAP_V3 = "uniswap_v3"
@@ -17,7 +17,7 @@ class EthereumDex(Enum):
     
 
 PIVOT_TOKENS = {
-    Network.SOLANA.value: {"SOL", "JUP", "RAY", "JLP"},
+    Network.SOLANA.value: {"SOL", "JUP", "RAY", "JLP","JupSOL","JitoSOL","dSOL"},
     Network.ETHEREUM.value: {"ETH","WETH", "UNI"}
 }
 
