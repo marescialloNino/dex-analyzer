@@ -1,6 +1,6 @@
 # src/clients/base_client.py
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 from src.models.pair import LiquidityPair
 from src.models.position import Position
 from src.models.price_bar import PriceBar
@@ -23,7 +23,7 @@ class BaseDEXClient(ABC):
         pass
 
 
-    def filter_pairs(self, pairs: List[LiquidityPair], min_tvl: float = 10000, min_volume: float = 5000, no_stables: bool=True, no_pivots: bool=True) -> List[LiquidityPair]:
+    def filter_pairs(self, pairs: List[LiquidityPair], min_tvl: float = 10000, max_tvl: float = 10000000000,  min_volume: float = 5000, no_stables: bool=True, no_pivots: bool=True) -> List[LiquidityPair]:
         """Filter pairs."""
         if (no_stables and no_pivots):
             return [
@@ -32,24 +32,24 @@ class BaseDEXClient(ABC):
                     pair.token1_symbol not in self.stablecoins and 
                     pair.token0_symbol not in self.pivots and 
                     pair.token1_symbol not in self.pivots and 
-                    pair.tvl >= min_tvl and pair.volume >= min_volume)
+                    pair.tvl >= min_tvl and pair.tvl <= max_tvl and pair.volume >= min_volume)
             ]
         elif (no_stables and not no_pivots):
             return [
                 pair for pair in pairs
                 if (pair.token0_symbol not in self.stablecoins and 
                     pair.token1_symbol not in self.stablecoins and  
-                    pair.tvl >= min_tvl and pair.volume >= min_volume)
+                    pair.tvl >= min_tvl and pair.tvl <= max_tvl and pair.volume >= min_volume)
             ]
         elif (no_pivots and not no_stables):
             return [
                 pair for pair in pairs
                 if (pair.token0_symbol not in self.stablecoins and 
                     pair.token1_symbol not in self.stablecoins and 
-                    pair.tvl >= min_tvl and pair.volume >= min_volume)
+                    pair.tvl >= min_tvl and pair.tvl <= max_tvl and pair.volume >= min_volume)
             ]
         else:
             return [
                 pair for pair in pairs
-                if (pair.tvl >= min_tvl and pair.volume >= min_volume)
+                if (pair.tvl >= min_tvl and pair.tvl <= max_tvl and pair.volume >= min_volume)
             ]
