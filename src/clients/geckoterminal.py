@@ -69,6 +69,7 @@ class GeckoTerminalClient(BaseDEXClient):
         self,
         all_pages: bool = True,
         min_tvl: float = 0.0,
+        max_tvl: float = 10000000000.0,
         min_volume: float = 0.0,  
         no_pivots: bool = True,
         no_stables: bool = True,
