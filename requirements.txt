@@ -1,4 +1,7 @@
-solders
+
 mplfinance
 requests
 pandas
+
+solders
+git+https://github.com/MeteoraAg/dlmm-sdk.git@main#subdirectory=python-client/dlmm

@@ -133,6 +133,11 @@ class SolanaMeteoraClient(BaseDEXClient):
                (pool.token1_address == self.SOL_ADDRESS and pool.token0_address in self.UTILITY_TOKENS)
         ]
 
+    def get_price_bars(self, pair_address: str, token_symbol: str, from_date: str, to_date: str, timeframe: str = "1h", base_currency: str = "usd") -> PriceBar:
+        """Fetch price bars for a specific pair address using Moralis."""
+        return self.price_fetcher.get_price_bars(pair_address, token_symbol, from_date, to_date, timeframe, base_currency)
+  
+    
     def get_all_positions_for_user(self, user_pubkey: str) -> Dict[str, List[Position]]:
         """
         Retrieves all open positions for a given user across all Meteora DLMM pools.
@@ -179,7 +184,3 @@ class SolanaMeteoraClient(BaseDEXClient):
             if hasattr(e, 'response') and e.response:
                 print(f"Response text: {e.response.text}")
             return {}
-
-    def get_price_bars(self, pair_address: str, token_symbol: str, from_date: str, to_date: str, timeframe: str = "1h", base_currency: str = "usd") -> PriceBar:
-        """Fetch price bars for a specific pair address using Moralis."""
-        return self.price_fetcher.get_price_bars(pair_address, token_symbol, from_date, to_date, timeframe, base_currency)
