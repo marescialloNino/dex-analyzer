@@ -6,7 +6,6 @@ class Network(Enum):
     ETHEREUM = "eth"
     BSC= "bsc"
     POLYGONPOS = "polygon_pos"
-    POLYGONZK = "polygon-zkevm"
     ARBITRUM = "arbitrum"
     SUI = "sui-network"
     BASE= "base"
