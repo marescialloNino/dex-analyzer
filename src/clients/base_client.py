@@ -32,24 +32,24 @@ class BaseDEXClient(ABC):
                     pair.token1_symbol not in self.stablecoins and 
                     pair.token0_symbol not in self.pivots and 
                     pair.token1_symbol not in self.pivots and 
-                    pair.tvl >= min_tvl and pair.tvl <= max_tvl and pair.volume >= min_volume)
+                    (pair.tvl >= min_tvl and pair.tvl <= max_tvl) and pair.volume >= min_volume)
             ]
         elif (no_stables and not no_pivots):
             return [
                 pair for pair in pairs
                 if (pair.token0_symbol not in self.stablecoins and 
                     pair.token1_symbol not in self.stablecoins and  
-                    pair.tvl >= min_tvl and pair.tvl <= max_tvl and pair.volume >= min_volume)
+                    (pair.tvl >= min_tvl and pair.tvl <= max_tvl) and pair.volume >= min_volume)
             ]
         elif (no_pivots and not no_stables):
             return [
                 pair for pair in pairs
                 if (pair.token0_symbol not in self.stablecoins and 
                     pair.token1_symbol not in self.stablecoins and 
-                    pair.tvl >= min_tvl and pair.tvl <= max_tvl and pair.volume >= min_volume)
+                    (pair.tvl >= min_tvl and pair.tvl <= max_tvl) and pair.volume >= min_volume)
             ]
         else:
             return [
                 pair for pair in pairs
-                if (pair.tvl >= min_tvl and pair.tvl <= max_tvl and pair.volume >= min_volume)
+                if ((pair.tvl >= min_tvl and pair.tvl <= max_tvl) and pair.volume >= min_volume)
             ]

@@ -6,7 +6,7 @@ import pandas as pd
 from src.clients.base_client import BaseDEXClient
 from src.models.pair import LiquidityPair
 from src.models.price_bar import PriceBar
-from src.constants import PIVOT_TOKENS, STABLECOINS
+from src.constants import NETWORK_CONFIG
 
 class GeckoTerminalClient(BaseDEXClient):
     def __init__(self, network: str, dex: str):
@@ -26,8 +26,8 @@ class GeckoTerminalClient(BaseDEXClient):
         self.max_pages = 10  # Maximum pages allowed by the API
         
         # Use our constants for filtering
-        self.pivots = PIVOT_TOKENS.get(network, set())
-        self.stablecoins = STABLECOINS.get(network, set())
+        self.pivots = NETWORK_CONFIG.get(network).get("pivot_tokens")
+        self.stablecoins = NETWORK_CONFIG.get(network).get("stables")
 
     def _rate_limit_check(self):
         """Enforce rate limiting: 30 calls per minute."""
