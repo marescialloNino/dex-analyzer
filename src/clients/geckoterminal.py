@@ -128,7 +128,7 @@ class GeckoTerminalClient(BaseDEXClient):
                     volume = 0.0
 
                 # Apply filters for TVL and volume
-                if tvl < min_tvl or volume < min_volume:
+                if tvl < min_tvl or tvl > max_tvl or volume < min_volume:
                     continue
 
                 if utility_pairs:
