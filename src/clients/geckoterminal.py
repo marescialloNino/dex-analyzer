@@ -24,6 +24,8 @@ class GeckoTerminalClient(BaseDEXClient):
         self.rate_limit = 30  # calls per minute
         self.calls = []
         self.max_pages = 10  # Maximum pages allowed by the API
+        self.max_retries = 3  # Maximum retries for rate-limited requests
+        self.retry_base_delay = 3  # Base delay in seconds for exponential backoff
         
         # Use our constants for filtering
         self.pivots = NETWORK_CONFIG.get(network).get("pivot_tokens")
@@ -36,22 +38,44 @@ class GeckoTerminalClient(BaseDEXClient):
         if len(self.calls) >= self.rate_limit:
             sleep_time = 60 - (current_time - self.calls[0])
             if sleep_time > 0:
+                print(f"Rate limit reached ({self.rate_limit} calls/min). Sleeping for {sleep_time:.2f} seconds...")
                 time.sleep(sleep_time)
         self.calls.append(current_time)
 
     def _make_request(self, endpoint: str, params: Optional[Dict] = None) -> Dict:
-        """Make an API request with rate limiting."""
+        """
+        Make an API request with rate limiting and exponential backoff retries.
+        
+        :param endpoint: API endpoint to call
+        :param params: Optional query parameters
+        :return: Response JSON or empty dict on failure
+        """
         self._rate_limit_check()
-        try:
-            response = self.session.get(f"{self.base_url}{endpoint}", params=params)
-            if response.status_code == 401:
-                print(f"Error making request: 401 Unauthorized for url: {response.url}")
-                return {"error": "Unauthorized"}
-            response.raise_for_status()
-            return response.json()
-        except requests.exceptions.RequestException as e:
-            print(f"Error making request: {e}")
-            return {}
+        retries = 0
+        while retries <= self.max_retries:
+            try:
+                response = self.session.get(f"{self.base_url}{endpoint}", params=params)
+                if response.status_code == 429:
+                    sleep_time = self.retry_base_delay * (2 ** retries)  # Exponential backoff: 3, 9, 27 seconds
+                    print(f"429 Too Many Requests for url: {response.url}. Retrying ({retries+1}/{self.max_retries}) after {sleep_time:.2f} seconds...")
+                    time.sleep(sleep_time)
+                    retries += 1
+                    continue
+                if response.status_code == 401:
+                    print(f"Error making request: 401 Unauthorized for url: {response.url}")
+                    return {"error": "Unauthorized"}
+                response.raise_for_status()
+                return response.json()
+            except requests.exceptions.RequestException as e:
+                print(f"Error making request: {e}")
+                if retries == self.max_retries:
+                    print(f"Max retries ({self.max_retries}) reached for {endpoint}. Giving up.")
+                    return {}
+                sleep_time = self.retry_base_delay * (2 ** retries)
+                print(f"Request failed. Retrying ({retries+1}/{self.max_retries}) after {sleep_time:.2f} seconds...")
+                time.sleep(sleep_time)
+                retries += 1
+        return {}
 
     def _get_all_pages(self, endpoint: str, params: Dict) -> List[Dict]:
         """Retrieve all available pages (up to max_pages) for an endpoint."""
@@ -244,6 +268,24 @@ class GeckoTerminalClient(BaseDEXClient):
             token_symbol=quote_symbol,
             data=df
         )
+    
+    def fetch_multiple_pools(self, pool_addresses: List[str]) -> List[Dict]:
+        """
+        Fetch data for multiple pools on the network using the multi endpoint.
+        
+        :param pool_addresses: List of pool addresses to fetch.
+        :return: List of dictionaries with pool data.
+        """
+        if not pool_addresses:
+            return []
+        
+        addresses_str = ','.join(pool_addresses)
+        endpoint = f"/networks/{self.network}/pools/multi/{addresses_str}"
+        response = self._make_request(endpoint)
+        if not response or 'data' not in response:
+            print(f"No data found for multiple pools: {addresses_str}")
+            return []
+        return response.get('data', [])
     
     def get_open_positions(self, address: str):
         raise NotImplementedError("get_open_positions is not implemented for GeckoTerminalClient.")
